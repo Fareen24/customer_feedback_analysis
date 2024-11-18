@@ -1,6 +1,3 @@
-Here's a detailed README for the **Customer Feedback Analysis and Summarization Project**, including a focus on the first phase you completed. 
-
----
 
 # Customer Feedback Analysis and Summarization
 
