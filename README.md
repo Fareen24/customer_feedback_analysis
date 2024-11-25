@@ -1,8 +1,7 @@
 
 # Customer Feedback Analysis and Summarization
 
-This project is designed to help businesses gain actionable insights from customer feedback collected across multiple sources, such as product reviews, social media comments, and surveys. By leveraging NLP techniques and a summarization model (BART), the tool will analyze and summarize customer feedback, detect themes and sentiments, and generate a streamlined summary of qualitative feedback data.
-
+This chatbot  will help users  gain actionable insights from customer feedback collected across multiple sources, such as product reviews, social media comments, and surveys. The chatbot will leverage abstractuve sunmmarization from BART Transformers and Retrieval-Augmented Generation(RAG) and will be able  analyze and summarize customer feedback, detect themes and sentiments, generate a streamlined summary of customer feedback and actionionable insights.
 ## Project Structure
 
 The project is structured into three main phases:
@@ -62,5 +61,5 @@ Then using the `clean_review_text` as input and `clean_summary` as the target to
 On the dataset we compared summaries that the model generated with the one from the dataset. 
 
 
-This is shown in the `train_validation_splitting` notebook and `finetuning_with_BART` notebook.
+This is in the `train_validation_splitting` notebook and `finetuning_with_BART` notebook.
 
