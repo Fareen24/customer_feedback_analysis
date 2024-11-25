@@ -27,7 +27,7 @@ To use these datasets, download them and place them in the appropriate folder in
 
 In this phase, we focused on cleaning, preprocessing, and preparing the customer feedback data for model training.
 
-### Steps Completed
+### Steps taken
 
 1. **Data Loading and Inspection**
    - Loaded customer feedback from multiple sources, such as product reviews, into a Pandas DataFrame named `data`.
@@ -40,7 +40,7 @@ In this phase, we focused on cleaning, preprocessing, and preparing the customer
      - **Removing stopwords** with NLTK to focus on meaningful words.
      - **Tokenization** using NLTK to break down text into individual tokens.
      - **Lemmatization** to reduce words to their root form.
-   - Saved the cleaned data as `clean_review_text` and `clean_review_title` in the DataFrame.
+   - Saved the cleaned data  in the DataFrame.
 
 3. **Sentiment Analysis and Theme Detection**
    - Conducted sentiment analysis using the VADER sentiment analysis tool to label feedback as positive, negative, or neutral.
@@ -54,17 +54,13 @@ In this phase, we focused on cleaning, preprocessing, and preparing the customer
 
 ## Phase 2: Fine-Tuning BART for Text Summarization
 
-In this phase, we will fine-tune a BART model to generate summaries from customer feedback, focusing on extracting concise insights. 
+### Steps taken
+In this phase, I  split the data into training, validation, and test datasets and converting it into a huggung face dataset for easy copatibility during fine-tuning of the model. Then saved it to load it for finetuning.
 
-### Steps Overview
-1. **Prepare Training Data**: Create input-output pairs for training BART using `full_text` as input and providing for generating target summaries.
-2. **Fine-Tune BART**: Use Hugging Face Transformers to fine-tune BART, adjusting parameters like learning rate and batch size.
-3. **Evaluation**: Measure performance using summarization metrics like  BLEU, as well as human evaluations where possible.
+Then using the `clean_review_text` as input and `clean_summary` as the target toeknized the dataset  tokenized it  and used it for fine-tuning the BART model.
 
-## Phase 3: Building a Knowledge-Augmented Chatbot Using LlamaIndex
-
-In this phase, the summarization model will be paired with a Retrieval-Augmented Generation (RAG) system using LlamaIndex to create a chatbot that provides insights from feedback and retrieves additional context from curated knowledge bases.
+On the dataset we compared summaries that the model generated with the one from the dataset. 
 
 
+This is shown in the `train_validation_splitting` notebook and `finetuning_with_BART` notebook.
 
----
