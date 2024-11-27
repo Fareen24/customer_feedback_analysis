@@ -6,7 +6,10 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import requests
+import time
 
+# Access the huggingface token 
+hf_token = st.secrets["huggingface"]["HF_TOKEN"]
 
 # Model paths and IDs
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
@@ -38,6 +41,27 @@ def get_llm_hf_inference(model_id="mistralai/Mistral-7B-Instruct-v0.3", max_new_
     )
     return hf_model
 
+@st.cache_data
+def generate_hf_response(system_message, user_input, chat_history):
+    hf_model = get_llm_hf_inference()
+    prompt = PromptTemplate.from_template(
+        (
+            "[INST] {system_message}"
+            "\nKnowledge Base:\n{knowledge_base}"
+            "\nConversation History:\n{chat_history}\n\n"
+            "User: {user_input}\n[/INST]\nAI:"
+        )
+    )
+    chat = prompt | hf_model.bind(skip_prompt=True) | StrOutputParser(output_key='content')
+    response = chat.invoke(input={
+        "system_message": system_message,
+        "knowledge_base": knowledge_base,
+        "chat_history": chat_history,
+        "user_input": user_input
+    })
+    response = response.split("AI:")[-1]
+    return response
+
 # Load knowledge base text from GitHub raw URL
 def load_knowledge_base(url):
     try:
@@ -49,7 +73,18 @@ def load_knowledge_base(url):
 
 knowledge_base = load_knowledge_base(knowledge_base_url)
 
-# Streamlit app configuration
+# Handling rate limits
+def request_with_retry(url, headers, retries=5, delay=60):
+    for _ in range(retries):
+        response = requests.get(url, headers=headers)
+        if response.status_code == 429:
+            print("Rate limit exceeded, retrying...")
+            time.sleep(delay) 
+        else:
+            return response
+    return None
+
+# The app configuration
 st.set_page_config(page_title="Insight Snap")
 st.title("Insight Snap")
 
@@ -76,12 +111,14 @@ def generate_response(system_message, user_input, chat_history, max_new_tokens=1
             )
         )
         chat = prompt | hf_model.bind(skip_prompt=True) | StrOutputParser(output_key='content')
+        
         response = chat.invoke(input={
             "system_message": system_message,
             "knowledge_base": knowledge_base,
             "chat_history": chat_history,
             "user_input": user_input
         })
+        
         response = response.split("AI:")[-1]
         return response
     except Exception as e:
@@ -101,9 +138,12 @@ if st.button("Submit"):
             system_message = "You are a helpful assistant providing insights from customer feedback."
             response = generate_response(system_message, user_input, st.session_state.chat_history)
             
-            # Update chat history
-            st.session_state.chat_history.append({"role": "user", "content": user_input})
-            st.session_state.chat_history.append({"role": "assistant", "content": response})
-            st.markdown(f"**Response:** \n{response}")
+            # Handle empty or error responses 
+            if response:
+                st.session_state.chat_history.append({"role": "user", "content": user_input})
+                st.session_state.chat_history.append({"role": "assistant", "content": response})
+                st.markdown(f"**Response:** \n{response}")
+            else:
+                st.warning("No response generated. Please try again later.")
     else:
         st.warning("Please enter a query.")
