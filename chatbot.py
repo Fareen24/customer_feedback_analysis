@@ -8,6 +8,9 @@ from langchain_core.output_parsers import StrOutputParser
 import requests
 import time
 
+# Access the token from Streamlit secrets
+hf_token = st.secrets["huggingface"]["HF_TOKEN"]
+
 # Model paths and IDs
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 bart_model_path = "ChijoTheDatascientist/finetuned-BART_model"
@@ -34,7 +37,7 @@ def get_llm_hf_inference(model_id="mistralai/Mistral-7B-Instruct-v0.3", max_new_
         repo_id=model_id,
         max_new_tokens=max_new_tokens,
         temperature=temperature,
-        token=os.getenv("HF_TOKEN") 
+        token=hf_token  # Using the token retrieved from Streamlit secrets
     )
     return hf_model
 
@@ -70,18 +73,18 @@ def load_knowledge_base(url):
 
 knowledge_base = load_knowledge_base(knowledge_base_url)
 
-# Handling rate limits
+# Retry mechanism for handling rate limits
 def request_with_retry(url, headers, retries=5, delay=60):
     for _ in range(retries):
         response = requests.get(url, headers=headers)
         if response.status_code == 429:
             print("Rate limit exceeded, retrying...")
-            time.sleep(delay) 
+            time.sleep(delay)  # Wait before retrying
         else:
             return response
     return None
 
-# The app configuration
+# Streamlit app configuration
 st.set_page_config(page_title="Insight Snap")
 st.title("Insight Snap")
 
@@ -109,6 +112,7 @@ def generate_response(system_message, user_input, chat_history, max_new_tokens=1
         )
         chat = prompt | hf_model.bind(skip_prompt=True) | StrOutputParser(output_key='content')
         
+        # Send the API request with retry logic
         response = chat.invoke(input={
             "system_message": system_message,
             "knowledge_base": knowledge_base,
@@ -135,8 +139,9 @@ if st.button("Submit"):
             system_message = "You are a helpful assistant providing insights from customer feedback."
             response = generate_response(system_message, user_input, st.session_state.chat_history)
             
-            # Handle empty or error responses 
+            # Handle empty or error responses gracefully
             if response:
+                # Update chat history
                 st.session_state.chat_history.append({"role": "user", "content": user_input})
                 st.session_state.chat_history.append({"role": "assistant", "content": response})
                 st.markdown(f"**Response:** \n{response}")
