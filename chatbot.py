@@ -7,6 +7,9 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import requests
 
+# Access the huggingface token 
+hf_token = st.secrets["huggingface"]["HF_TOKEN"]
+
 # Model paths and IDs
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 bart_model_path = "ChijoTheDatascientist/finetuned-BART_model"
