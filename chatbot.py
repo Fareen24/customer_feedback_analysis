@@ -21,6 +21,7 @@ bart_tokenizer = AutoTokenizer.from_pretrained(bart_model_path)
 bart_model = AutoModelForSeq2SeqLM.from_pretrained(bart_model_path).to(device)
 
 # Function to summarize reviews using BART
+@st.cache_data
 def summarize_review(review_text):
     inputs = bart_tokenizer(review_text, max_length=1024, truncation=True, return_tensors="pt")
     summary_ids = bart_model.generate(inputs["input_ids"], max_length=40, min_length=10, length_penalty=2.0, num_beams=8, early_stopping=True)
@@ -28,12 +29,12 @@ def summarize_review(review_text):
     return summary
 
 # Load the HuggingFace model for response generation
-def get_llm_hf_inference(model_id=model_id, max_new_tokens=128, temperature=0.1):
+def get_llm_hf_inference(model_id="mistralai/Mistral-7B-Instruct-v0.3", max_new_tokens=128, temperature=0.1):
     hf_model = HuggingFaceEndpoint(
         repo_id=model_id,
         max_new_tokens=max_new_tokens,
         temperature=temperature,
-        token=os.getenv("HF_TOKEN")  
+        token=st.secrets["HF_TOKEN"] 
     )
     return hf_model
 
@@ -41,7 +42,7 @@ def get_llm_hf_inference(model_id=model_id, max_new_tokens=128, temperature=0.1)
 def load_knowledge_base(url):
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Raise HTTPError for bad responses
+        response.raise_for_status() 
         return response.text
     except Exception as e:
         return f"Error loading knowledge base: {e}"
