@@ -6,3 +6,4 @@ summarization_model/
 .ipynb_checkpoints/
 Untitled.ipynb
 __pycache__/
+.streamlit/secrets.toml
