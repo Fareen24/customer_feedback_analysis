@@ -5,11 +5,12 @@ import streamlit as st
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+import requests
 
 # Model paths and IDs
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-bart_model_path = "/home/chijofareen/Gomycode_projects/customer_feedback_analysis/summarization_model"
-knowledge_base_path = "/home/chijofareen/Gomycode_projects/customer_feedback_analysis/data/data.txt"
+bart_model_path = "ChijoTheDatascientist/finetuned-BART_model"
+knowledge_base_url = "https://raw.githubusercontent.com/Fareen24/customer_feedback_analysis/main/data/data.txt"
 
 # Load BART model for summarization 
 device = torch.device('cpu') 
@@ -35,12 +36,16 @@ def get_llm_hf_inference(model_id=model_id, max_new_tokens=128, temperature=0.1)
     )
     return hf_model
 
-# Load knowledge base text from file
-def load_knowledge_base(path):
-    with open(path, "r") as file:
-        return file.read()
+# Load knowledge base text from GitHub raw URL
+def load_knowledge_base(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise HTTPError for bad responses
+        return response.text
+    except Exception as e:
+        return f"Error loading knowledge base: {e}"
 
-knowledge_base = load_knowledge_base(knowledge_base_path)
+knowledge_base = load_knowledge_base(knowledge_base_url)
 
 # Streamlit app configuration
 st.set_page_config(page_title="Insight Snap")
