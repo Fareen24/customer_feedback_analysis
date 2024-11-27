@@ -8,7 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 # Model paths and IDs
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-bart_model_path = "/home/chijofareen/Gomycode_projects/summarization_model/model"
+bart_model_path = "/home/chijofareen/Gomycode_projects/customer_feedback_analysis/summarization_model"
 knowledge_base_path = "/home/chijofareen/Gomycode_projects/customer_feedback_analysis/data/data.txt"
 
 # Load BART model for summarization 
