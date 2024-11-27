@@ -2,3 +2,7 @@
 datasets/
 *.json
 
+summarization_model/
+.ipynb_checkpoints/
+Untitled.ipynb
+__pycache__/
