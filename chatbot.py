@@ -37,7 +37,7 @@ def get_llm_hf_inference(model_id="mistralai/Mistral-7B-Instruct-v0.3", max_new_
         repo_id=model_id,
         max_new_tokens=max_new_tokens,
         temperature=temperature,
-        token=hf_token  # Using the token retrieved from Streamlit secrets
+        token=hf_token  
     )
     return hf_model
 
@@ -73,16 +73,53 @@ def load_knowledge_base(url):
 
 knowledge_base = load_knowledge_base(knowledge_base_url)
 
-# Retry mechanism for handling rate limits
+# Handling rate limits
 def request_with_retry(url, headers, retries=5, delay=60):
     for _ in range(retries):
-        response = requests.get(url, headers=headers)
-        if response.status_code == 429:
-            print("Rate limit exceeded, retrying...")
-            time.sleep(delay)  # Wait before retrying
-        else:
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  
             return response
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 429:
+                print("Rate limit exceeded, retrying...")
+                time.sleep(delay)  
+            else:
+                raise e
     return None
+
+# Chat function to generate responses 
+def generate_response(system_message, user_input, chat_history, max_new_tokens=128):
+    try:
+        hf_model = get_llm_hf_inference(max_new_tokens=max_new_tokens)
+        prompt = PromptTemplate.from_template(
+            (
+                "[INST] {system_message}"
+                "\nKnowledge Base:\n{knowledge_base}"
+                "\nConversation History:\n{chat_history}\n\n"
+                "User: {user_input}\n[/INST]\nAI:"
+            )
+        )
+        chat = prompt | hf_model.bind(skip_prompt=True) | StrOutputParser(output_key='content')
+
+        # Attempt to invoke API request
+        response = chat.invoke(input={
+            "system_message": system_message,
+            "knowledge_base": knowledge_base,
+            "chat_history": chat_history,
+            "user_input": user_input
+        })
+
+        response = response.split("AI:")[-1]
+        return response
+
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 429:
+            return "You have reached your limit... try again later"
+        else:
+            return f"An error occurred: {e}"
+    except Exception as e:
+        return f"Error generating response: {e}"
 
 # Streamlit app configuration
 st.set_page_config(page_title="Insight Snap")
@@ -98,33 +135,6 @@ st.markdown("""
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# Chat function to generate responses 
-def generate_response(system_message, user_input, chat_history, max_new_tokens=128):
-    try:
-        hf_model = get_llm_hf_inference(max_new_tokens=max_new_tokens)
-        prompt = PromptTemplate.from_template(
-            (
-                "[INST] {system_message}"
-                "\nKnowledge Base:\n{knowledge_base}"
-                "\nConversation History:\n{chat_history}\n\n"
-                "User: {user_input}\n[/INST]\nAI:"
-            )
-        )
-        chat = prompt | hf_model.bind(skip_prompt=True) | StrOutputParser(output_key='content')
-        
-        # Send the API request with retry logic
-        response = chat.invoke(input={
-            "system_message": system_message,
-            "knowledge_base": knowledge_base,
-            "chat_history": chat_history,
-            "user_input": user_input
-        })
-        
-        response = response.split("AI:")[-1]
-        return response
-    except Exception as e:
-        return f"Error generating response: {e}"
-
 # Chat interface 
 user_input = st.text_input("Enter your query:")
 
@@ -139,7 +149,7 @@ if st.button("Submit"):
             system_message = "You are a helpful assistant providing insights from customer feedback."
             response = generate_response(system_message, user_input, st.session_state.chat_history)
             
-            # Handle empty or error responses gracefully
+            # Handle empty or error responses 
             if response:
                 # Update chat history
                 st.session_state.chat_history.append({"role": "user", "content": user_input})
@@ -148,4 +158,4 @@ if st.button("Submit"):
             else:
                 st.warning("No response generated. Please try again later.")
     else:
-        st.warning("Please enter a query.")
+        st.warning("Ask me a question on customer feedback...")
