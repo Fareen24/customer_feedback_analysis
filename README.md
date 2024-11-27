@@ -8,7 +8,7 @@ The project is structured into three main phases:
 
 1. **Data Preparation and Preprocessing** 
 2. **Fine-tuning BART for Text Summarization**
-3. **Building a Knowledge-Augmented Chatbot Using LlamaIndex**
+3. **Used HuggingFace Mistral Model for generating business insights and feedback**
 
 ## Data Files
 
@@ -62,4 +62,17 @@ On the dataset we compared summaries that the model generated with the one from 
 
 
 This is in the `train_validation_splitting` notebook and `finetuning_with_BART` notebook.
+
+## Phase 3: Building the Chatbot
+The chatbot integrated two key models:
+
+1. **Fine-tuned BART model** for summarizing customer reviews.
+2. **HuggingFace Mistral Model** for generating business insights and feedback.
+3. The chatbot also utilizes a **custom knowledge base** to provide context-based responses and actionable insights.
+
+## Features
+The chatbot is able to:
+
+1. Summarize reviews
+2. Give insights on customer feedback and general queries about it.
 
