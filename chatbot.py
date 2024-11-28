@@ -7,6 +7,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import requests
 import time
+from huggingface_hub import login
 
 # Access the Hugging Face token from Streamlit secrets
 hf_token = st.secrets["huggingface"]["HF_TOKEN"]
@@ -20,8 +21,8 @@ knowledge_base_url = "https://raw.githubusercontent.com/Fareen24/customer_feedba
 device = torch.device('cpu') 
 
 # Load model and tokenizer directly with authentication
-tokenizer = AutoTokenizer.from_pretrained(bart_model_path, token=hf_token)
-model = AutoModelForSeq2SeqLM.from_pretrained(bart_model_path, token=hf_token).to(device)
+bart_tokenizer = AutoTokenizer.from_pretrained(bart_model_path)
+bart_model = AutoModelForSeq2SeqLM.from_pretrained(bart_model_path).to(device)
 
 # Function to summarize reviews using BART
 @st.cache_data
