@@ -9,3 +9,4 @@ accelerate
 watchdog
 tqdm
 torch
+safetensors

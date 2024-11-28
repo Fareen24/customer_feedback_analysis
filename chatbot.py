@@ -13,7 +13,7 @@ hf_token = st.secrets["huggingface"]["HF_TOKEN"]
 
 # Model paths and IDs
 model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-bart_model_path = "ChijoTheDatascientist/finetuned-BART_model"
+bart_model_path = "ChijoTheDatascientist/summarization-model"
 knowledge_base_url = "https://raw.githubusercontent.com/Fareen24/customer_feedback_analysis/main/data/data.txt"
 
 # Load BART model for summarization 
