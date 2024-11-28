@@ -8,7 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 import requests
 import time
 
-# Access the token from Streamlit secrets
+# Access the Hugging Face token from Streamlit secrets
 hf_token = st.secrets["huggingface"]["HF_TOKEN"]
 
 # Model paths and IDs
@@ -19,9 +19,9 @@ knowledge_base_url = "https://raw.githubusercontent.com/Fareen24/customer_feedba
 # Load BART model for summarization 
 device = torch.device('cpu') 
 
-# Initialize BART tokenizer and model
-bart_tokenizer = AutoTokenizer.from_pretrained(bart_model_path)
-bart_model = AutoModelForSeq2SeqLM.from_pretrained(bart_model_path).to(device)
+# Load model and tokenizer directly with authentication
+tokenizer = AutoTokenizer.from_pretrained(bart_model_path, token=hf_token)
+model = AutoModelForSeq2SeqLM.from_pretrained(bart_model_path, token=hf_token).to(device)
 
 # Function to summarize reviews using BART
 @st.cache_data
@@ -32,7 +32,8 @@ def summarize_review(review_text):
     return summary
 
 # Load the HuggingFace model for response generation
-def get_llm_hf_inference(model_id="mistralai/Mistral-7B-Instruct-v0.3", max_new_tokens=128, temperature=0.1):
+def get_llm_hf_inference(model_id=model_id, max_new_tokens=128, temperature=0.1):
+    # Use HuggingFaceEndpoint and pass the token
     hf_model = HuggingFaceEndpoint(
         repo_id=model_id,
         max_new_tokens=max_new_tokens,
