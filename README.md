@@ -6,8 +6,6 @@ This chatbot provides actionable insights from customer feedback collected acros
 
 🌐 [Try the App on Hugging Face Spaces](https://huggingface.co/spaces/ChijoTheDatascientist/chatbot-customer-feedback)
 
-![App Screenshot](/home/chijofareen/Gomycode_projects/customer_feedback_analysis/insightsnapdemopic.png)
-
 
 ## Project Structure
 
