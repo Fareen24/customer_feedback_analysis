@@ -1,7 +1,14 @@
 
 # Customer Feedback Analysis and Summarization
 
-This chatbot  will help users  gain actionable insights from customer feedback collected across multiple sources, such as product reviews, social media comments, and surveys. The chatbot will leverage abstractuve sunmmarization from BART Transformers and Retrieval-Augmented Generation(RAG) and will be able  analyze and summarize customer feedback, detect themes and sentiments, generate a streamlined summary of customer feedback and actionionable insights.
+
+This chatbot provides actionable insights from customer feedback collected across various sources, such as product reviews from Sephora, Amazon and an online clothing store. It leverages abstractive summarization using BART Transformers and advanced natural language processing capabilities from the Mistral model to analyze feedback, detect themes and sentiments, and generate streamlined summaries and actionable insights.
+
+🌐 [Try the App on Hugging Face Spaces](https://huggingface.co/spaces/ChijoTheDatascientist/chatbot-customer-feedback)
+
+![App Screenshot](/home/chijofareen/Gomycode_projects/customer_feedback_analysis/insightsnapdemopic.png)
+
+
 ## Project Structure
 
 The project is structured into three main phases:
@@ -10,6 +17,7 @@ The project is structured into three main phases:
 2. **Fine-tuning BART for Text Summarization**
 3. **Used HuggingFace Mistral Model for generating business insights and feedback**
 
+# Project files
 ## Data Files
 
 The following dataset files are hosted on Google Drive due to size limitations on GitHub:
@@ -21,6 +29,13 @@ The following dataset files are hosted on Google Drive due to size limitations o
 
 To use these datasets, download them and place them in the appropriate folder in your local project directory.
 
+## Other files
+**data_preprocessing.ipynb**: Notebook on data preparation and preprocessing
+**train_validation_splitting.ipynb**: Notebook on splitting the data into train, test and validation sets for fine-tuning the BART Model
+**finetuning_with_BART**: Notebook on finetuning BART Model and saving the model and tokenizer.
+**uploading_model_huggingfacehub.py**: python script of uploading finetuned model to cloud on hugging face space.
+
+**application file**: The applcation file is hosted on the hugging face platform where the app is hosted.
 
 ## Phase 1: Data Preparation and Preprocessing 
 
@@ -66,9 +81,8 @@ This is in the `train_validation_splitting` notebook and `finetuning_with_BART` 
 ## Phase 3: Building the Chatbot
 The chatbot integrated two key models:
 
-1. **Fine-tuned BART model** for summarizing customer reviews.
-2. **HuggingFace Mistral Model** for generating business insights and feedback.
-3. The chatbot also utilizes a **custom knowledge base** to provide context-based responses and actionable insights.
+1. **Fine-tuned BART model** for summarizing customer reviews that was uploaded on the hugging face spaces.
+2. **HuggingFace Mistral 7B Model** for generating business insights and feedback.
 
 ## Features
 The chatbot is able to:
